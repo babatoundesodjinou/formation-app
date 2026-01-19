@@ -1,0 +1,175 @@
+<div class="container mt-4 mb-5">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-shopping-cart text-primary me-2"></i>
+        Mon Panier
+      </h2>
+    </div>
+  </div>
+
+  <!-- Panier vide -->
+  <div class="row" *ngIf="cartItems.length === 0">
+    <div class="col-12">
+      <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+        <h3>Votre panier est vide</h3>
+        <p class="text-muted mb-4">Découvrez nos formations et commencez votre apprentissage !</p>
+        <a routerLink="/formations" class="btn btn-primary">
+          <i class="fas fa-book me-2"></i>
+          Voir les formations
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panier avec items -->
+  <div class="row" *ngIf="cartItems.length > 0">
+    <!-- Liste des items -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+              <i class="fas fa-list me-2"></i>
+              {{ cartItems.length }} formation(s) dans le panier
+            </h5>
+            <button class="btn btn-sm btn-outline-danger" (click)="clearCart()">
+              <i class="fas fa-trash me-1"></i>
+              Vider le panier
+            </button>
+          </div>
+
+          <hr>
+
+          <!-- Items du panier -->
+          <div *ngFor="let item of cartItems; let last = last">
+            <div class="row align-items-center py-3">
+              <div class="col-md-3">
+                <img [src]="item.formation.image" [alt]="item.formation.titre"
+                     class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+              </div>
+
+              <div class="col-md-6">
+                <h5 class="mb-2">{{ item.formation.titre }}</h5>
+                <p class="text-muted mb-2">
+                  <i class="fas fa-user-tie me-2"></i>{{ item.formation.instructeur }}
+                </p>
+                <div>
+                  <span class="badge bg-primary me-2">{{ item.formation.categorie }}</span>
+                  <span class="badge bg-info">{{ item.formation.niveau }}</span>
+                </div>
+              </div>
+
+              <div class="col-md-3 text-end">
+                <h4 class="text-primary mb-3">{{ formatPrice(item.formation.prix) }} FCFA</h4>
+                <button class="btn btn-sm btn-outline-danger" (click)="removeItem(item.formation.id)">
+                  <i class="fas fa-times me-1"></i>
+                  Retirer
+                </button>
+              </div>
+            </div>
+            <hr *ngIf="!last">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Résumé et paiement -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm sticky-top" style="top: 20px;">
+        <div class="card-body">
+          <h5 class="card-title mb-4">
+            <i class="fas fa-receipt me-2"></i>
+            Résumé de la commande
+          </h5>
+
+          <!-- Détails du résumé -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Nombre de formations:</span>
+              <strong>{{ cartItems.length }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Sous-total:</span>
+              <strong>{{ formatPrice(total) }} FCFA</strong>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-3">
+              <h5 class="mb-0">Total:</h5>
+              <h4 class="text-primary mb-0">{{ formatPrice(total) }} FCFA</h4>
+            </div>
+          </div>
+
+          <!-- Méthode de paiement -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              <i class="fas fa-credit-card me-2"></i>
+              Méthode de paiement
+            </label>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="paymentMethod"
+                     id="widgetMethod" [(ngModel)]="paymentMethod" value="widget" checked>
+              <label class="form-check-label" for="widgetMethod">
+                Widget FedaPay (Modal)
+                <small class="text-muted d-block">Paiement sur cette page</small>
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="paymentMethod"
+                     id="redirectMethod" [(ngModel)]="paymentMethod" value="redirect">
+              <label class="form-check-label" for="redirectMethod">
+                Page de paiement FedaPay
+                <small class="text-muted d-block">Redirection vers FedaPay</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- Informations client -->
+          <div class="bg-light p-3 rounded mb-3" *ngIf="currentUser">
+            <h6 class="mb-2">
+              <i class="fas fa-user me-2"></i>
+              Informations client
+            </h6>
+            <small class="d-block">{{ currentUser.prenom }} {{ currentUser.nom }}</small>
+            <small class="d-block">{{ currentUser.email }}</small>
+            <small class="d-block">{{ currentUser.telephone }}</small>
+          </div>
+
+          <!-- Bouton de paiement -->
+          <button
+            class="btn btn-primary btn-lg w-100"
+            [disabled]="isProcessing"
+            (click)="proceedToPayment()">
+            <span *ngIf="!isProcessing">
+              <i class="fas fa-lock me-2"></i>
+              Procéder au paiement
+            </span>
+            <span *ngIf="isProcessing">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Traitement en cours...
+            </span>
+          </button>
+
+          <!-- Logo FedaPay -->
+          <div class="text-center mt-3">
+            <small class="text-muted">Paiement sécurisé par</small>
+            <div class="mt-2">
+              <img src="https://fedapay.com/assets/images/logo.svg" alt="FedaPay" style="height: 30px;">
+            </div>
+          </div>
+
+          <!-- Méthodes de paiement acceptées -->
+          <div class="text-center mt-3 pt-3 border-top">
+            <small class="text-muted d-block mb-2">Moyens de paiement acceptés</small>
+            <div class="d-flex justify-content-center gap-2">
+              <i class="fab fa-cc-visa fa-2x text-primary"></i>
+              <i class="fab fa-cc-mastercard fa-2x text-danger"></i>
+              <i class="fas fa-mobile-alt fa-2x text-success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

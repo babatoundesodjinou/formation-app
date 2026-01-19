@@ -1,0 +1,128 @@
+<div class="container mt-5 mb-5">
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="!isLoading && order" class="text-center">
+    <!-- Animation de succès -->
+    <div class="success-checkmark mb-4">
+      <div class="check-icon">
+        <span class="icon-line line-tip"></span>
+        <span class="icon-line line-long"></span>
+        <div class="icon-circle"></div>
+        <div class="icon-fix"></div>
+      </div>
+    </div>
+
+    <h1 class="text-success mb-3">
+      <i class="fas fa-check-circle"></i>
+      Paiement Réussi !
+    </h1>
+    <p class="lead mb-5">Merci pour votre achat. Votre commande a été confirmée.</p>
+
+    <!-- Détails de la commande -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-receipt me-2"></i>
+              Détails de la commande
+            </h5>
+          </div>
+          <div class="card-body">
+            <!-- Informations générales -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <p class="mb-2">
+                  <strong>Numéro de commande:</strong><br>
+                  <span class="text-primary">{{ order.id }}</span>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p class="mb-2">
+                  <strong>Date:</strong><br>
+                  {{ formatDate(order.dateCreation) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="row mb-4" *ngIf="order.transactionId">
+              <div class="col-12">
+                <p class="mb-2">
+                  <strong>ID de transaction:</strong><br>
+                  <span class="text-muted">{{ order.transactionId }}</span>
+                </p>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Formations commandées -->
+            <h6 class="mb-3">
+              <i class="fas fa-book me-2"></i>
+              Formations achetées
+            </h6>
+            <div class="list-group mb-4">
+              <div class="list-group-item" *ngFor="let item of order.formations">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-1">{{ item.formation.titre }}</h6>
+                    <small class="text-muted">
+                      <i class="fas fa-user-tie me-1"></i>
+                      {{ item.formation.instructeur }}
+                    </small>
+                  </div>
+                  <span class="badge bg-primary rounded-pill">
+                    {{ formatPrice(item.formation.prix) }} FCFA
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total -->
+            <div class="bg-light p-3 rounded mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Total payé:</h5>
+                <h4 class="text-success mb-0">{{ formatPrice(order.montantTotal) }} FCFA</h4>
+              </div>
+            </div>
+
+            <!-- Prochaines étapes -->
+            <div class="alert alert-info">
+              <h6 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>
+                Prochaines étapes
+              </h6>
+              <ul class="mb-0 ps-3">
+                <li>Un email de confirmation vous a été envoyé</li>
+                <li>Vous pouvez maintenant accéder à vos formations</li>
+                <li>Consultez votre tableau de bord pour commencer l'apprentissage</li>
+              </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-3 justify-content-center">
+              <button class="btn btn-outline-primary" (click)="downloadReceipt()">
+                <i class="fas fa-download me-2"></i>
+                Télécharger le reçu
+              </button>
+              <a routerLink="/mes-formations" class="btn btn-success">
+                <i class="fas fa-play me-2"></i>
+                Accéder aux formations
+              </a>
+              <a routerLink="/formations" class="btn btn-outline-secondary">
+                <i class="fas fa-book me-2"></i>
+                Voir plus de formations
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

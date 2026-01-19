@@ -1,0 +1,86 @@
+<div class="container mt-4">
+  <!-- Hero Section -->
+  <div class="hero-section mb-5 p-5 bg-light rounded">
+    <h1 class="display-4 fw-bold text-primary">Découvrez Nos Formations</h1>
+    <p class="lead">Développez vos compétences avec des formations de qualité dispensées par des experts</p>
+  </div>
+
+  <!-- Filtres et Recherche -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="input-group">
+        <span class="input-group-text bg-white">
+          <i class="fas fa-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher une formation..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()">
+      </div>
+    </div>
+    <div class="col-md-4">
+      <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterByCategory(selectedCategory)">
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des formations -->
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4" *ngFor="let formation of filteredFormations">
+      <div class="card h-100 shadow-sm formation-card" (click)="viewDetails(formation)">
+        <img [src]="formation.image" class="card-img-top" [alt]="formation.titre" style="height: 200px; object-fit: cover;">
+
+        <div class="card-body d-flex flex-column">
+          <div class="mb-2">
+            <span class="badge bg-primary">{{ formation.categorie }}</span>
+            <span class="badge bg-info ms-2">{{ formation.niveau }}</span>
+          </div>
+
+          <h5 class="card-title">{{ formation.titre }}</h5>
+          <p class="card-text text-muted">{{ formation.description }}</p>
+
+          <div class="mt-auto">
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-user-tie text-primary me-2"></i>
+              <small>{{ formation.instructeur }}</small>
+            </div>
+
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-clock text-primary me-2"></i>
+              <small>{{ formation.duree }}</small>
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-star text-warning me-2"></i>
+              <small>{{ formation.note }} ({{ formation.nombreEtudiants }} étudiants)</small>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="h4 text-primary mb-0">{{ formatPrice(formation.prix) }} FCFA</span>
+              <button
+                class="btn btn-sm"
+                [class.btn-success]="isInCart(formation.id)"
+                [class.btn-primary]="!isInCart(formation.id)"
+                (click)="addToCart(formation, $event)">
+                <i class="fas" [class.fa-check]="isInCart(formation.id)" [class.fa-cart-plus]="!isInCart(formation.id)"></i>
+                {{ isInCart(formation.id) ? 'Dans le panier' : 'Ajouter' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucune formation trouvée -->
+  <div class="text-center py-5" *ngIf="filteredFormations.length === 0">
+    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+    <h4>Aucune formation trouvée</h4>
+    <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+  </div>
+</div>

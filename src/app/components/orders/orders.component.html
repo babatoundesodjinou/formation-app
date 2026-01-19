@@ -1,0 +1,121 @@
+<div class="container mt-4 mb-5">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-list-alt text-primary me-2"></i>
+        Mes Commandes
+      </h2>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Aucune commande -->
+  <div *ngIf="!isLoading && orders.length === 0">
+    <div class="text-center py-5">
+      <i class="fas fa-shopping-bag fa-5x text-muted mb-4"></i>
+      <h3>Aucune commande</h3>
+      <p class="text-muted mb-4">Vous n'avez pas encore effectué de commande</p>
+      <a routerLink="/formations" class="btn btn-primary">
+        <i class="fas fa-book me-2"></i>
+        Découvrir les formations
+      </a>
+    </div>
+  </div>
+
+  <!-- Liste des commandes -->
+  <div *ngIf="!isLoading && orders.length > 0">
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm mb-4" *ngFor="let order of orders">
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <h5 class="mb-0">
+                  <i class="fas fa-receipt me-2"></i>
+                  Commande {{ order.id }}
+                </h5>
+                <small class="text-muted">{{ formatDate(order.dateCreation) }}</small>
+              </div>
+              <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                <span class="badge" [ngClass]="getStatusBadge(order.statut)">
+                  {{ getStatusText(order.statut) }}
+                </span>
+                <span class="ms-3 fw-bold text-primary">
+                  {{ formatPrice(order.montantTotal) }} FCFA
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- ID de transaction -->
+            <div class="mb-3" *ngIf="order.transactionId">
+              <small class="text-muted">
+                <strong>ID Transaction:</strong> {{ order.transactionId }}
+              </small>
+            </div>
+
+            <!-- Formations -->
+            <h6 class="mb-3">
+              <i class="fas fa-book me-2"></i>
+              Formations ({{ order.formations.length }})
+            </h6>
+
+            <div class="row g-3">
+              <div class="col-md-6" *ngFor="let item of order.formations">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="d-flex">
+                      <img [src]="item.formation.image" [alt]="item.formation.titre"
+                           class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                      <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ item.formation.titre }}</h6>
+                        <small class="text-muted d-block mb-2">
+                          <i class="fas fa-user-tie me-1"></i>
+                          {{ item.formation.instructeur }}
+                        </small>
+                        <div>
+                          <span class="badge bg-primary">{{ item.formation.categorie }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 d-flex gap-2" *ngIf="order.statut === 'payee'">
+              <a routerLink="/mes-formations" class="btn btn-sm btn-success">
+                <i class="fas fa-play me-2"></i>
+                Accéder aux formations
+              </a>
+              <button class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-download me-2"></i>
+                Télécharger le reçu
+              </button>
+            </div>
+
+            <!-- Message d'erreur -->
+            <div class="alert alert-danger mt-3 mb-0" *ngIf="order.statut === 'echouee'">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Le paiement de cette commande a échoué. Veuillez réessayer.
+            </div>
+
+            <!-- Message en attente -->
+            <div class="alert alert-warning mt-3 mb-0" *ngIf="order.statut === 'en_attente'">
+              <i class="fas fa-clock me-2"></i>
+              Paiement en attente de confirmation.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
