@@ -1,23 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CartService } from '../../services/cart.service';
 import { FedapayService } from '../../services/fedapay.service';
 import { OrderService } from '../../services/order.service';
 import { UserService } from '../../services/user.service';
-import { CartItem, FedaPayTransaction, User } from '../../models/formation.model';
+import { CartItem, User } from '../../models/formation.model';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
 
   cartItems: CartItem[] = [];
   total: number = 0;
   currentUser: User | null = null;
   isProcessing: boolean = false;
-  paymentMethod: 'widget' | 'redirect' = 'widget';
+
+  private paymentSubscription?: Subscription;
+  private cancelSubscription?: Subscription;
 
   constructor(
     private cartService: CartService,
@@ -40,6 +43,38 @@ export class CartComponent implements OnInit {
 
     // Charger l'utilisateur
     this.currentUser = this.userService.getCurrentUserSync();
+
+    // Écouter les événements de paiement
+    this.setupPaymentListeners();
+  }
+
+  ngOnDestroy(): void {
+    // Nettoyer les souscriptions
+    if (this.paymentSubscription) {
+      this.paymentSubscription.unsubscribe();
+    }
+    if (this.cancelSubscription) {
+      this.cancelSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Configure les écouteurs pour les événements de paiement
+   */
+  private setupPaymentListeners(): void {
+    // Écouter les paiements complétés
+    this.paymentSubscription = this.fedapayService.onPaymentComplete().subscribe(
+      (transaction) => {
+        this.handlePaymentSuccess(transaction);
+      }
+    );
+
+    // Écouter les paiements annulés
+    this.cancelSubscription = this.fedapayService.onPaymentCancel().subscribe(
+      () => {
+        this.handlePaymentCancel();
+      }
+    );
   }
 
   removeItem(formationId: number): void {
@@ -55,10 +90,10 @@ export class CartComponent implements OnInit {
   }
 
   /**
-   * FONCTION PRINCIPALE DE PAIEMENT
-   * Cette fonction gère tout le processus de paiement avec FedaPay
+   * 🔥 FONCTION PRINCIPALE DE PAIEMENT (VERSION SIMPLIFIÉE)
+   * Utilise l'approche FedaPay.open() directement
    */
-  async proceedToPayment(): Promise<void> {
+  proceedToPayment(): void {
     if (this.cartItems.length === 0) {
       alert('Votre panier est vide !');
       return;
@@ -79,117 +114,70 @@ export class CartComponent implements OnInit {
         this.total
       );
 
-      console.log('Commande créée:', order);
+      console.log('📦 Commande créée:', order);
 
-      // 2. Préparer les données de transaction FedaPay
-      const transactionData: any = {
-        description: `Paiement de ${this.cartItems.length} formation(s) - Commande ${order.id}`,
-        amount: 3406.34,
-        currency: {
-          iso: 'XOF' // Franc CFA
+      // 2. Préparer la description de la transaction
+      const description = `Paiement de ${this.cartItems.length} formation(s) - Commande ${order.id}`;
+
+      // 3. Ouvrir le widget FedaPay directement
+      this.fedapayService.openCheckout({
+        transaction: {
+          amount: this.total,
+          description: description,
+          callback_url: `${window.location.origin}/paiement/callback/${order.id}`
         },
-        callback_url: `http://127.0.0.1:8000/api/v1/webhooks/fedapay/?order_id=fedapay_98cff7d2b8e0`,
-        customer: {
-          firstname: this.currentUser.prenom,
-          lastname: this.currentUser.nom,
-          email: this.currentUser.email,
-          phone_number: {
-            number: this.currentUser.telephone,
-            country: 'bj' // Code pays Bénin
-          }
-        }
-      };
+        onComplete: (transaction) => {
+          // Le paiement est complété
+          console.log('✅ Transaction complétée:', transaction);
 
+          // Mettre à jour le statut de la commande
+          this.orderService.updateOrderStatus(
+            order.id,
+            'payee',
+            transaction.id?.toString()
+          );
 
-      console.log('Données de transaction:', transactionData);
+          // Vider le panier
+          this.cartService.clearCart();
 
-      // 3. Créer la transaction avec FedaPay
-      this.fedapayService.createTransaction(transactionData).subscribe({
-        next: (response) => {
-          console.log('Réponse FedaPay:', response);
-
-          if (response && response.v1) {
-            // Sauvegarder la référence de transaction
-            this.orderService.updateOrderStatus(
-              order.id,
-              'en_attente',
-              response.v1.id.toString()
-            );
-
-            // 4. Choisir la méthode de paiement
-            if (this.paymentMethod === 'widget') {
-              // Utiliser le widget FedaPay (modal)
-              this.openPaymentWidget(response.v1.token, order.id);
-            } else {
-              // Rediriger vers la page de paiement FedaPay
-              this.redirectToPaymentPage(response.v1.url);
-            }
-          } else {
-            throw new Error('Réponse invalide de FedaPay');
-          }
-        },
-        error: (error) => {
-          console.error('Erreur lors de la création de la transaction:', error);
           this.isProcessing = false;
+
+          // Rediriger vers la page de confirmation
+          this.router.navigate(['/paiement/success', order.id]);
+        },
+        onClose: () => {
+          // L'utilisateur a fermé la fenêtre
+          console.log('❌ Paiement annulé ou fenêtre fermée');
 
           // Mettre à jour le statut de la commande
           this.orderService.updateOrderStatus(order.id, 'echouee');
 
-          alert('Erreur lors de l\'initialisation du paiement. Veuillez réessayer.');
+          this.isProcessing = false;
         }
       });
 
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('❌ Erreur lors de l\'initialisation du paiement:', error);
       this.isProcessing = false;
       alert('Une erreur est survenue. Veuillez réessayer.');
     }
   }
 
   /**
-   * Ouvre le widget de paiement FedaPay (Modal)
+   * Gère le succès du paiement
    */
-  private openPaymentWidget(token: string, orderId: string): void {
-    this.fedapayService.openPaymentWidget(
-      token,
-      (response) => {
-        // Paiement réussi
-        console.log('Paiement complété:', response);
-
-        // Mettre à jour le statut de la commande
-        this.orderService.updateOrderStatus(orderId, 'payee', response.id);
-
-        // Vider le panier
-        this.cartService.clearCart();
-
-        this.isProcessing = false;
-
-        // Rediriger vers la page de confirmation
-        this.router.navigate(['/paiement/success', orderId]);
-      },
-      () => {
-        // Paiement annulé
-        console.log('Paiement annulé');
-
-        // Mettre à jour le statut de la commande
-        this.orderService.updateOrderStatus(orderId, 'echouee');
-
-        this.isProcessing = false;
-
-        alert('Paiement annulé');
-      }
-    );
+  private handlePaymentSuccess(transaction: any): void {
+    console.log('🎉 Paiement réussi:', transaction);
+    this.isProcessing = false;
   }
 
   /**
-   * Redirige vers la page de paiement FedaPay
+   * Gère l'annulation du paiement
    */
-  private redirectToPaymentPage(paymentUrl: string): void {
-    // Sauvegarder l'URL actuelle pour le retour
-    sessionStorage.setItem('returnUrl', this.router.url);
-
-    // Rediriger vers FedaPay
-    this.fedapayService.redirectToPaymentPage(paymentUrl);
+  private handlePaymentCancel(): void {
+    console.log('⚠️ Paiement annulé par l\'utilisateur');
+    this.isProcessing = false;
+    alert('Le paiement a été annulé.');
   }
 
   formatPrice(price: number): string {

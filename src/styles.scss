@@ -1,34 +1,237 @@
-/* Vous pouvez ajouter des styles globaux dans ce fichier */
+/* ============================================
+   VARIABLES DE COULEURS - LIGHT MODE (PAR DÉFAUT)
+   ============================================ */
+:root {
+  // Couleurs principales
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #0dcaf0;
 
-// Variables
-$primary-color: #0d6efd;
-$success-color: #198754;
-$danger-color: #dc3545;
+  // Couleurs de fond
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
 
-// Global Styles
+  // Couleurs de texte
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+
+  // Couleurs de bordure
+  --border-color: #dee2e6;
+
+  // Couleurs de carte
+  --card-bg: #ffffff;
+  --card-border: #dee2e6;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+
+  // Navbar
+  --navbar-bg: #0d6efd;
+  --navbar-text: #ffffff;
+
+  // Hero gradient
+  --hero-gradient-start: #667eea;
+  --hero-gradient-end: #764ba2;
+
+  // Input
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --input-text: #212529;
+
+  // Footer
+  --footer-bg: #212529;
+  --footer-text: #ffffff;
+
+  // Transitions
+  --transition-speed: 0.3s;
+}
+
+/* ============================================
+   VARIABLES DE COULEURS - DARK MODE
+   ============================================ */
+[data-theme="dark"] {
+  // Couleurs principales (ajustées pour le dark)
+  --primary-color: #4d94ff;
+  --secondary-color: #8e95a0;
+  --success-color: #2ecc71;
+  --danger-color: #e74c3c;
+  --warning-color: #f39c12;
+  --info-color: #3498db;
+
+  // Couleurs de fond
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f1419;
+
+  // Couleurs de texte
+  --text-primary: #e4e6eb;
+  --text-secondary: #b0b3b8;
+  --text-muted: #8a8d91;
+
+  // Couleurs de bordure
+  --border-color: #3a3b3c;
+
+  // Couleurs de carte
+  --card-bg: #242526;
+  --card-border: #3a3b3c;
+  --card-shadow: rgba(0, 0, 0, 0.5);
+
+  // Navbar (plus sombre)
+  --navbar-bg: #16213e;
+  --navbar-text: #e4e6eb;
+
+  // Hero gradient (ajusté pour dark)
+  --hero-gradient-start: #4a5568;
+  --hero-gradient-end: #2d3748;
+
+  // Input
+  --input-bg: #3a3b3c;
+  --input-border: #4a4b4c;
+  --input-text: #e4e6eb;
+
+  // Footer
+  --footer-bg: #0f1419;
+  --footer-text: #e4e6eb;
+}
+
+/* ============================================
+   STYLES GLOBAUX
+   ============================================ */
+* {
+  transition: background-color var(--transition-speed) ease,
+              color var(--transition-speed) ease,
+              border-color var(--transition-speed) ease;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 main {
   min-height: calc(100vh - 200px);
 }
 
-// Formation Card
-.formation-card {
-  transition: all 0.3s ease;
-  cursor: pointer;
+// Texte
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
 
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+// Backgrounds
+.bg-light {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-dark {
+  background-color: var(--footer-bg) !important;
+  color: var(--footer-text) !important;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+  background-color: var(--navbar-bg) !important;
+  box-shadow: 0 2px 4px var(--card-shadow);
+
+  .navbar-brand,
+  .nav-link {
+    color: var(--navbar-text) !important;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .dropdown-menu {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+
+    .dropdown-item {
+      color: var(--text-primary);
+
+      &:hover {
+        background-color: var(--bg-secondary);
+      }
+    }
+
+    .dropdown-divider {
+      border-color: var(--border-color);
+    }
   }
 }
 
-// Hero Section
+// Bouton de toggle du thème
+.theme-toggle {
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: rotate(20deg);
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+/* ============================================
+   CARTES
+   ============================================ */
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+  color: var(--text-primary);
+
+  .card-header {
+    background-color: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .card-body {
+    color: var(--text-primary);
+  }
+
+  .card-footer {
+    background-color: var(--bg-secondary);
+    border-top-color: var(--border-color);
+  }
+}
+
+// Carte de formation
+.formation-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--card-shadow);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--card-shadow);
+  }
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
   color: white;
 
   h1, p {
@@ -36,7 +239,141 @@ main {
   }
 }
 
-// Success Checkmark Animation
+/* ============================================
+   FORMULAIRES
+   ============================================ */
+.form-control,
+.form-select {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+
+  &:focus {
+    background-color: var(--input-bg);
+    border-color: var(--primary-color);
+    color: var(--input-text);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.input-group-text {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+// Form check (radio, checkbox)
+.form-check-input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+
+  &:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+}
+
+.form-check-label {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   BOUTONS
+   ============================================ */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+
+  &:hover {
+    background-color: darken(#4d94ff, 10%);
+    border-color: darken(#4d94ff, 10%);
+  }
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+
+  &:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+}
+
+.btn-outline-danger {
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+
+  &:hover {
+    background-color: var(--danger-color);
+    color: white;
+  }
+}
+
+.btn-outline-secondary {
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+
+  &:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.8em;
+}
+
+/* ============================================
+   LISTS
+   ============================================ */
+.list-group {
+  .list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+
+    &:hover {
+      background-color: var(--bg-secondary);
+    }
+  }
+}
+
+/* ============================================
+   ALERTS
+   ============================================ */
+.alert {
+  border-color: var(--border-color);
+
+  &.alert-info {
+    background-color: rgba(13, 202, 240, 0.1);
+    color: var(--text-primary);
+    border-color: var(--info-color);
+  }
+
+  &.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--text-primary);
+    border-color: var(--warning-color);
+  }
+
+  &.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--text-primary);
+    border-color: var(--danger-color);
+  }
+}
+
+/* ============================================
+   SUCCESS CHECKMARK ANIMATION
+   ============================================ */
 .success-checkmark {
   width: 80px;
   height: 80px;
@@ -48,28 +385,11 @@ main {
     position: relative;
     border-radius: 50%;
     box-sizing: content-box;
-    border: 4px solid $success-color;
-
-    &::before {
-      top: 3px;
-      left: -2px;
-      width: 30px;
-      transform-origin: 100% 50%;
-      border-radius: 100px 0 0 100px;
-    }
-
-    &::after {
-      top: 0;
-      left: 30px;
-      width: 60px;
-      transform-origin: 0 50%;
-      border-radius: 0 100px 100px 0;
-      animation: rotate-circle 4.25s ease-in;
-    }
+    border: 4px solid var(--success-color);
 
     .icon-line {
       height: 5px;
-      background-color: $success-color;
+      background-color: var(--success-color);
       display: block;
       border-radius: 2px;
       position: absolute;
@@ -101,7 +421,7 @@ main {
       border-radius: 50%;
       position: absolute;
       box-sizing: content-box;
-      border: 4px solid rgba(76, 175, 80, 0.5);
+      border: 4px solid rgba(46, 204, 113, 0.5);
     }
 
     .icon-fix {
@@ -112,89 +432,69 @@ main {
       height: 85px;
       position: absolute;
       transform: rotate(-45deg);
-      background-color: white;
+      background-color: var(--bg-primary);
     }
   }
 }
 
-@keyframes rotate-circle {
-  0% {
-    transform: rotate(-45deg);
-  }
-  5% {
-    transform: rotate(-45deg);
-  }
-  12% {
-    transform: rotate(-405deg);
-  }
-  100% {
-    transform: rotate(-405deg);
-  }
-}
-
 @keyframes icon-line-tip {
-  0% {
-    width: 0;
-    left: 1px;
-    top: 19px;
-  }
-  54% {
-    width: 0;
-    left: 1px;
-    top: 19px;
-  }
-  70% {
-    width: 50px;
-    left: -8px;
-    top: 37px;
-  }
-  84% {
-    width: 17px;
-    left: 21px;
-    top: 48px;
-  }
-  100% {
-    width: 25px;
-    left: 14px;
-    top: 45px;
-  }
+  0% { width: 0; left: 1px; top: 19px; }
+  54% { width: 0; left: 1px; top: 19px; }
+  70% { width: 50px; left: -8px; top: 37px; }
+  84% { width: 17px; left: 21px; top: 48px; }
+  100% { width: 25px; left: 14px; top: 45px; }
 }
 
 @keyframes icon-line-long {
-  0% {
-    width: 0;
-    right: 46px;
-    top: 54px;
+  0% { width: 0; right: 46px; top: 54px; }
+  65% { width: 0; right: 46px; top: 54px; }
+  84% { width: 55px; right: 0px; top: 35px; }
+  100% { width: 47px; right: 8px; top: 38px; }
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+
+  a {
+    color: var(--text-muted);
+
+    &:hover {
+      color: var(--text-primary);
+    }
   }
-  65% {
-    width: 0;
-    right: 46px;
-    top: 54px;
-  }
-  84% {
-    width: 55px;
-    right: 0px;
-    top: 35px;
-  }
-  100% {
-    width: 47px;
-    right: 8px;
-    top: 38px;
+
+  hr {
+    border-color: var(--border-color);
   }
 }
 
-// Badge personnalisé
-.badge {
-  font-weight: 500;
-  padding: 0.4em 0.8em;
+/* ============================================
+   SCROLLBAR PERSONNALISÉ
+   ============================================ */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-// Carte sticky
-.sticky-top {
-  position: sticky;
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
 }
 
-// Animations
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -210,7 +510,17 @@ main {
   animation: fadeIn 0.5s ease-in;
 }
 
-// Responsive
+/* ============================================
+   SPINNER
+   ============================================ */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 @media (max-width: 768px) {
   .hero-section {
     padding: 2rem !important;
@@ -219,28 +529,24 @@ main {
       font-size: 2rem;
     }
   }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+  }
 }
 
-// Loading spinner
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
+/* ============================================
+   UTILITAIRES
+   ============================================ */
+.sticky-top {
+  position: sticky;
 }
 
-// Custom scrollbar
-::-webkit-scrollbar {
-  width: 10px;
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem var(--card-shadow) !important;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.shadow {
+  box-shadow: 0 0.5rem 1rem var(--card-shadow) !important;
 }

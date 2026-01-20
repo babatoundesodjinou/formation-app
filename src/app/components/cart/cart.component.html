@@ -101,30 +101,6 @@
             </div>
           </div>
 
-          <!-- Méthode de paiement -->
-          <div class="mb-4">
-            <label class="form-label fw-bold">
-              <i class="fas fa-credit-card me-2"></i>
-              Méthode de paiement
-            </label>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" name="paymentMethod"
-                     id="widgetMethod" [(ngModel)]="paymentMethod" value="widget" checked>
-              <label class="form-check-label" for="widgetMethod">
-                Widget FedaPay (Modal)
-                <small class="text-muted d-block">Paiement sur cette page</small>
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="paymentMethod"
-                     id="redirectMethod" [(ngModel)]="paymentMethod" value="redirect">
-              <label class="form-check-label" for="redirectMethod">
-                Page de paiement FedaPay
-                <small class="text-muted d-block">Redirection vers FedaPay</small>
-              </label>
-            </div>
-          </div>
-
           <!-- Informations client -->
           <div class="bg-light p-3 rounded mb-3" *ngIf="currentUser">
             <h6 class="mb-2">

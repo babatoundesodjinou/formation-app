@@ -16,6 +16,8 @@ import { CartService } from './services/cart.service';
 import { FedapayService } from './services/fedapay.service';
 import { OrderService } from './services/order.service';
 import { UserService } from './services/user.service';
+import { ThemeService } from './services/theme.service';
+import { TestFedapayComponent } from './components/test-fedapay/test-fedapay.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,8 @@ import { UserService } from './services/user.service';
     CartComponent,
     PaymentSuccessComponent,
     OrderComponent,
-    OrdersComponent
+    OrdersComponent,
+    TestFedapayComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +41,8 @@ import { UserService } from './services/user.service';
     CartService,
     FedapayService,
     OrderService,
-    UserService
+    UserService,
+    ThemeService
   ],
   bootstrap: [AppComponent]
 })

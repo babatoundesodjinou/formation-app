@@ -1,0 +1,42 @@
+// Styles pour le composant de test FedaPay
+
+.card {
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+code {
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  word-wrap: break-word;
+}
+
+.btn-lg {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+// Animation pour les alertes
+.alert {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

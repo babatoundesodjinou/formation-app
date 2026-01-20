@@ -29,10 +29,23 @@
             Mes Commandes
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/test-fedapay" routerLinkActive="active">
+            <i class="fas fa-flask me-1"></i>
+            Test FedaPay
+          </a>
+        </li>
       </ul>
 
       <ul class="navbar-nav">
-        <li class="nav-item">
+        <!-- Bouton Theme Toggle -->
+        <li class="nav-item me-2">
+          <button class="btn btn-outline-light btn-sm theme-toggle" (click)="toggleTheme()" title="Changer de thème">
+            <i class="fas" [class.fa-moon]="currentTheme === 'light'" [class.fa-sun]="currentTheme === 'dark'"></i>
+          </button>
+        </li>
+
+        <li class="nav-item me-3">
           <a class="nav-link position-relative" routerLink="/panier">
             <i class="fas fa-shopping-cart fa-lg"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" *ngIf="cartCount > 0">
@@ -40,6 +53,7 @@
             </span>
           </a>
         </li>
+
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
             <i class="fas fa-user-circle me-1"></i>

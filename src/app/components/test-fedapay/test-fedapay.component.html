@@ -1,0 +1,174 @@
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="text-center mb-5">
+        <h1 class="display-4">
+          <i class="fas fa-flask text-primary me-3"></i>
+          Test FedaPay
+        </h1>
+        <p class="lead text-muted">Page de test pour l'intégration FedaPay</p>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-1 me-2"></i>
+            Méthode 1 : Bouton initialisé avec FedaPay.init()
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            Cette méthode initialise FedaPay directement sur un bouton HTML.
+            C'est la méthode la plus simple, identique à la documentation FedaPay.
+          </p>
+
+          <div class="bg-light p-3 rounded mb-3">
+            <code class="text-dark">
+              FedaPay.init('#pay-btn', {{ '{' }} transaction, customer {{ '}' }})
+            </code>
+          </div>
+
+          <div class="text-center">
+            <button id="pay-btn-init" class="btn btn-primary btn-lg">
+              <i class="fas fa-credit-card me-2"></i>
+              Payer {{ amount }} FCFA
+            </button>
+          </div>
+
+          <div class="alert alert-info mt-3 mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Note :</strong> Ce bouton est initialisé automatiquement au chargement de la page.
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-2 me-2"></i>
+            Méthode 2 : Ouverture directe avec FedaPay.open()
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            Cette méthode ouvre le widget FedaPay directement lors du clic,
+            sans pré-initialisation d'un bouton.
+          </p>
+
+          <div class="bg-light p-3 rounded mb-3">
+            <code class="text-dark">
+              FedaPay.open({{ '{' }} transaction, customer {{ '}' }})
+            </code>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Montant (FCFA)</label>
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="amount"
+                min="100"
+                step="100">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                [(ngModel)]="customerEmail">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Prénom</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="customerFirstname">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nom</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="customerLastname">
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button class="btn btn-success btn-lg" (click)="openCheckoutDirectly()">
+              <i class="fas fa-bolt me-2"></i>
+              Ouvrir le paiement
+            </button>
+          </div>
+
+          <div class="alert alert-success mt-3 mb-0">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Avantage :</strong> Plus flexible, permet de passer des données dynamiques.
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="fas fa-credit-card me-2"></i>
+            Cartes de Test FedaPay
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-success">
+                <i class="fas fa-check-circle me-2"></i>
+                Paiement Réussi
+              </h6>
+              <ul class="list-unstyled">
+                <li><strong>Numéro :</strong> 4000 0000 0000 0002</li>
+                <li><strong>Date :</strong> 12/25 (ou toute date future)</li>
+                <li><strong>CVV :</strong> 123 (ou n'importe quel code à 3 chiffres)</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-danger">
+                <i class="fas fa-times-circle me-2"></i>
+                Paiement Échoué
+              </h6>
+              <ul class="list-unstyled">
+                <li><strong>Numéro :</strong> 4000 0000 0000 0127</li>
+                <li><strong>Date :</strong> 12/25</li>
+                <li><strong>CVV :</strong> 123</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-terminal me-2"></i>
+            Console de Débogage
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-2">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            Ouvrez la console du navigateur (F12) pour voir les logs détaillés
+          </p>
+          <ul class="list-unstyled mb-0">
+            <li><code>✅ FedaPay SDK chargé avec succès</code></li>
+            <li><code>🔄 Initialisation du paiement FedaPay</code></li>
+            <li><code>✅ Paiement complété</code> ou <code>❌ Paiement annulé</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <a routerLink="/formations" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left me-2"></i>
+          Retour aux formations
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

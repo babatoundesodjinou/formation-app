@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { UserService } from '../../services/user.service';
+import { ThemeService, Theme } from '../../services/theme.service';
 import { User } from '../../models/formation.model';
 
 @Component({
@@ -12,10 +13,12 @@ export class HeaderComponent implements OnInit {
 
   cartCount: number = 0;
   currentUser: User | null = null;
+  currentTheme: Theme = 'light';
 
   constructor(
     private cartService: CartService,
-    private userService: UserService
+    private userService: UserService,
+    private themeService: ThemeService
   ) { }
 
   ngOnInit(): void {
@@ -28,5 +31,14 @@ export class HeaderComponent implements OnInit {
     this.userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
     });
+
+    // Récupérer le thème actuel
+    this.themeService.getTheme().subscribe(theme => {
+      this.currentTheme = theme;
+    });
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 }

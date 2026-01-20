@@ -1,107 +1,150 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
-import { FedaPayTransaction, FedaPayResponse } from '../models/formation.model';
+import { Observable, Subject } from 'rxjs';
 
-// Déclaration pour le SDK FedaPay
 declare const FedaPay: any;
+
+export interface FedaPayConfig {
+  public_key: string;
+  transaction: {
+    amount: number;
+    description: string;
+    callback_url?: string;
+  },
+  onComplete?: (transaction: any) => void;
+  onClose?: () => void;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class FedapayService {
 
-  // Clé publique FedaPay
-  private publicKey = 'pk_test_gCdyFgEYeK3Ri7hLh2t4hgqy';
+  // ✅ Clé publique uniquement
+  private publicKey = 'pk_sandbox_F-rXOZpKr8MW-jPY9fH2Nyoq';
 
-  // URL de l'API FedaPay
-  private apiUrl = 'https://sandbox-api.fedapay.com/v1';
+  // Sujets pour observer les événements de paiement
+  private paymentCompleteSubject = new Subject<any>();
+  private paymentCancelSubject = new Subject<void>();
 
-  // Pour la production, utilisez :
-  // private apiUrl = 'https://api.fedapay.com/v1';
-
-  constructor(private http: HttpClient) {
-    this.initFedaPay();
+  constructor() {
+    this.checkSDK();
   }
 
   /**
-   * Initialise le SDK FedaPay
+   * Vérifie que le SDK FedaPay est chargé
    */
-  private initFedaPay(): void {
+  private checkSDK(): void {
     if (typeof FedaPay !== 'undefined') {
-      FedaPay.init(this.publicKey);
+      console.log('✅ FedaPay SDK chargé avec succès');
     } else {
-      console.error('FedaPay SDK non chargé. Ajoutez le script dans index.html');
+      console.error('❌ FedaPay SDK non chargé. Vérifiez que le script est dans index.html');
     }
   }
 
   /**
-   * Crée une transaction FedaPay
+   * Initialise le paiement sur un élément HTML
+   * Cette méthode utilise l'approche simplifiée de FedaPay
+   * @param selector Sélecteur CSS de l'élément (ex: '#pay-btn')
+   * @param config Configuration du paiement
    */
-  createTransaction(transaction: FedaPayTransaction): Observable<FedaPayResponse> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.publicKey}`
-    });
-
-    return this.http.post<FedaPayResponse>(
-      `${this.apiUrl}/transactions`,
-      transaction,
-      { headers }
-    );
-  }
-
-  /**
-   * Ouvre le widget de paiement FedaPay
-   * @param transactionToken Token de la transaction
-   * @param onComplete Callback quand le paiement est terminé
-   * @param onCancel Callback quand le paiement est annulé
-   */
-  openPaymentWidget(
-    transactionToken: string,
-    onComplete: (resp: any) => void,
-    onCancel: () => void
-  ): void {
+  initPayment(selector: string, config: Partial<FedaPayConfig>): void {
     if (typeof FedaPay === 'undefined') {
-      console.error('FedaPay SDK non disponible');
+      console.error('❌ FedaPay SDK non disponible');
       return;
     }
 
-    FedaPay.checkout({
-      token: transactionToken,
-      onComplete: (resp: any) => {
-        console.log('Paiement complété:', resp);
-        onComplete(resp);
+    const fullConfig: FedaPayConfig = {
+      public_key: this.publicKey,
+      transaction: {
+        amount: config.transaction?.amount || 0,
+        description: config.transaction?.description || 'Paiement',
+        callback_url: config.transaction?.callback_url
       },
-      onCancel: () => {
-        console.log('Paiement annulé');
-        onCancel();
+      onComplete: (transaction) => {
+        console.log('✅ Paiement complété:', transaction);
+        this.paymentCompleteSubject.next(transaction);
+        if (config.onComplete) {
+          config.onComplete(transaction);
+        }
+      },
+      onClose: () => {
+        console.log('❌ Fenêtre de paiement fermée');
+        this.paymentCancelSubject.next();
+        if (config.onClose) {
+          config.onClose();
+        }
       }
-    });
+    };
+
+    console.log('🔄 Initialisation du paiement FedaPay:', fullConfig);
+
+    try {
+      FedaPay.init(selector, fullConfig);
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'initialisation FedaPay:', error);
+    }
   }
 
   /**
-   * Redirige vers la page de paiement FedaPay
-   * @param paymentUrl URL de paiement
+   * Ouvre directement le widget de paiement (sans bouton)
+   * @param config Configuration du paiement
    */
-  redirectToPaymentPage(paymentUrl: string): void {
-    window.location.href = paymentUrl;
+  openCheckout(config: Partial<FedaPayConfig>): void {
+    if (typeof FedaPay === 'undefined') {
+      console.error('❌ FedaPay SDK non disponible');
+      return;
+    }
+
+    const fullConfig = {
+      public_key: this.publicKey,
+      transaction: {
+        amount: config.transaction?.amount || 0,
+        description: config.transaction?.description || 'Paiement'
+      },
+      onComplete: (transaction: any) => {
+        console.log('✅ Paiement complété:', transaction);
+        this.paymentCompleteSubject.next(transaction);
+        if (config.onComplete) {
+          config.onComplete(transaction);
+        }
+      },
+      onClose: () => {
+        console.log('❌ Fenêtre de paiement fermée');
+        this.paymentCancelSubject.next();
+        if (config.onClose) {
+          config.onClose();
+        }
+      }
+    };
+
+    console.log('🔄 Ouverture du checkout FedaPay:', fullConfig);
+
+    try {
+      FedaPay.open(fullConfig);
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'ouverture du checkout:', error);
+    }
   }
 
   /**
-   * Vérifie le statut d'une transaction
-   * @param transactionId ID de la transaction
-   * @returns Observable du statut
+   * Observable pour écouter les paiements complétés
    */
-  checkTransactionStatus(transactionId: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.publicKey}`
-    });
+  onPaymentComplete(): Observable<any> {
+    return this.paymentCompleteSubject.asObservable();
+  }
 
-    return this.http.get(
-      `${this.apiUrl}/transactions/${transactionId}`,
-      { headers }
-    );
+  /**
+   * Observable pour écouter les paiements annulés
+   */
+  onPaymentCancel(): Observable<void> {
+    return this.paymentCancelSubject.asObservable();
+  }
+
+  /**
+   * Récupère la clé publique
+   */
+  getPublicKey(): string {
+    return this.publicKey;
   }
 
   /**
